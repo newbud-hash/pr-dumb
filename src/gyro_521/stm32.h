@@ -41,7 +41,6 @@ typedef enum{
 	OPEN_DRAIN
 }gpio_outpin_type;
 
-volatile gpio_reg *port_base_addr(gpio_port port_name);
 void gpio_output_state(gpio_port port_name, unsigned char pin, gpio_pin_state state);
 void gpio_output_toggle(gpio_port port_name, unsigned char pin);
 void gpio_mode_set(gpio_port port_name, unsigned char pin, gpio_mode mode_type);
