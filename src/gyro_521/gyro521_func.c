@@ -32,12 +32,12 @@ static char read_data(const struct gy_target_details *gy_target,
     read.data_buffer  = raw_buffer;
 
     ret = i2c_transfer(&target, &write, &read);
-    if(ret)
+    if(ret) {
         return ret;
+    }
 
     buf[0] = (short)(raw_buffer[0] << MSB_INDEX | raw_buffer[1]);
-    if(byte_count == ALL_AXIS_BYTE)
-    {
+    if(byte_count == ALL_AXIS_BYTE) {
         buf[1] = (short)(raw_buffer[2] << MSB_INDEX | raw_buffer[3]);
         buf[2] = (short)(raw_buffer[4] << MSB_INDEX | raw_buffer[5]);
     }
@@ -50,14 +50,17 @@ char gy521_initialize(const struct gy_target_details *gy_target_details)
     unsigned char               wake_up[2];
     struct i2c_transfer_details wake;
 
-    if(!gy_target_details || !gy_target_details->bus)
+    if(!gy_target_details || !gy_target_details->bus) {
         return -INVARG;
+    }
 
     I2C_TARGET_DETAILS(target, gy_target_details->address, STANDARD_MODE,
                        gy_target_details->bus);
 
-    if(i2c_transfer(&target, NULL, NULL))
+    if(i2c_transfer(&target, NULL, NULL)) {
         return -RETURN_FAILURE;
+    }
+
     printf("target 0x%x found on bus\n", gy_target_details->address);
 
     wake_up[0] = WAKE_REG;
@@ -66,9 +69,9 @@ char gy521_initialize(const struct gy_target_details *gy_target_details)
     wake.byte_count  = 2;
     wake.data_buffer = wake_up;
 
-    if(i2c_transfer(&target, &wake, NULL))
+    if(i2c_transfer(&target, &wake, NULL)) {
         return -RETURN_FAILURE;
-
+    }
     return RETURN_SUCCESS;
 }
 
@@ -76,32 +79,39 @@ char gyroscope_read(const struct gy_target_details *gy_target_details,
                     enum axis                       axis,
                     void                           *receive_buffer)
 {
-    if(!gy_target_details || !gy_target_details->bus || !receive_buffer)
+    if(!gy_target_details || !gy_target_details->bus || !receive_buffer) {
         return -INVARG;
+    }
 
-    if(axis < X || axis > XYZ)
+    if(axis < X || axis > XYZ) {
         return -INVARG;
+    }
 
-    if(axis == XYZ)
+    if(axis == XYZ) {
         return read_data(gy_target_details, GYRO_OUT, ALL_AXIS_BYTE, receive_buffer);
-    else
-        return read_data(gy_target_details, GYRO_OUT + (axis * 2), DATA_2B, receive_buffer);
+    }
+    else {
+	    return read_data(gy_target_details, GYRO_OUT + (axis * 2), DATA_2B, receive_buffer);
+    }
 }
 
 char accelerometer_read(const struct gy_target_details *gy_target_details,
                         enum axis                       axis,
                         void                           *receive_buffer)
 {
-    if(!gy_target_details || !gy_target_details->bus || !receive_buffer)
+    if(!gy_target_details || !gy_target_details->bus || !receive_buffer) {
         return -INVARG;
+    }
+    if(axis < X || axis > XYZ) {
+	    return -INVARG;
+    }
 
-    if(axis < X || axis > XYZ)
-        return -INVARG;
-
-    if(axis == XYZ)
+    if(axis == XYZ) {
         return read_data(gy_target_details, ACCEL_OUT, ALL_AXIS_BYTE, receive_buffer);
-    else
+    }
+    else {
         return read_data(gy_target_details, ACCEL_OUT + (axis * 2), DATA_2B, receive_buffer);
+    }
 }
 
 char temperature_read(const struct gy_target_details *gy_target_details,
@@ -110,12 +120,15 @@ char temperature_read(const struct gy_target_details *gy_target_details,
     char ret;
     short temp_receive = 0;
 
-    if(!gy_target_details || !gy_target_details->bus || !temperature_buffer)
+    if(!gy_target_details || !gy_target_details->bus || !temperature_buffer) {
         return -INVARG;
+    }
 
     ret = read_data(gy_target_details, TEMP_OUT, DATA_2B, &temp_receive);
-    if(ret)
+    if(ret) {
 	    return ret;
+    }
+    
     *temperature_buffer = ((float)temp_receive / 340.0f) + 36.53f;
 
     return ret;
