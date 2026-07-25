@@ -8,7 +8,7 @@
 
 #define GY_TARGET_DETAILS(name, bus, address)  \
     struct gy_target_details name = {          \
-        .bus = (void *)(bus),                  \
+        .bus         = (bus),                  \
         .address     = (address)               \
     }
 

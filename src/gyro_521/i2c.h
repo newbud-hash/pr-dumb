@@ -10,6 +10,13 @@
 #define RETURN_FAILURE 1
 #define INVARG         2
 
+#define I2C_TARGET_DETAILS(name, tar_addr, mod, bus_addr)  \
+    struct i2c_target_details name = {                     \
+        .target_address = tar_addr,                        \
+        .mode           = mod,                             \
+        .bus            = bus_addr,                        \
+}
+
 struct i2c_bus_details {
 	gpio_port     sda_port;
 	unsigned char sda_pin;
@@ -25,7 +32,7 @@ struct i2c_transfer_details {
 struct i2c_target_details {
 	unsigned char target_address;
 	unsigned char mode; /* standard mode - 100khz */
-	struct i2c_bus_details *bus_details;
+	void          *bus;
 };
 
 /* api for user */
